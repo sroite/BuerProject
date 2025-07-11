@@ -1,0 +1,400 @@
+<?xml version="1.0"?>
+<robot name="buer">
+
+  <!-- Head (Base link) -->
+  <link name="head">
+    <visual>
+      <geometry>
+        <mesh filename="obj/head.obj"/>
+      </geometry>
+      <!-- 材质可省略或补全 -->
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="1.0" length="1.0"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="8.0"/>
+      <inertia ixx="1.5" ixy="0" ixz="0" iyy="1.5" iyz="0" izz="2.0"/>
+    </inertial>
+    <!-- IMU -->
+    <sensor type="imu" name="imu">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </sensor>
+  </link>
+
+  <!-- Leg 1 -->
+  <link name="leg1_lap">
+    <visual>
+      <geometry>
+        <mesh filename="obj/lap.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/lap.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <mass value="1.2"/>
+      <inertia ixx="0.08" ixy="0" ixz="0" iyy="0.08" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+  <joint name="leg1_lap_joint" type="revolute">
+    <parent link="head"/>
+    <child link="leg1_lap"/>
+    <origin xyz="0 0.5505528 0" rpy="-1.57 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-0.5" upper="0.5"/>
+  </joint>
+
+  <link name="leg1_calf">
+    <visual>
+      <geometry>
+        <mesh filename="obj/calf.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/calf.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.4" rpy="0 0 0"/>
+      <mass value="0.8"/>
+      <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.005"/>
+    </inertial>
+  </link>
+  <joint name="leg1_calf_joint" type="revolute">
+    <parent link="leg1_lap"/>
+    <child link="leg1_calf"/>
+    <origin xyz="0 0 1" rpy="0 0 1.5708"/> <!-- 90度=1.5708弧度 -->
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57" />
+  </joint>
+
+  <link name="leg1_foot">
+    <visual>
+      <geometry>
+        <mesh filename="obj/foot.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/foot.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.5"/>
+      <inertia ixx="0.02" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.002"/>
+    </inertial>
+  </link>
+  <joint name="leg1_foot_joint" type="revolute">
+    <parent link="leg1_calf"/>
+    <child link="leg1_foot"/>
+    <origin xyz="0 0 0.8" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57" />
+  </joint>
+
+  <!-- Leg 2 -->
+  <link name="leg2_lap">
+    <visual>
+      <geometry>
+        <mesh filename="obj/lap.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/lap.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <mass value="1.2"/>
+      <inertia ixx="0.08" ixy="0" ixz="0" iyy="0.08" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+  <joint name="leg2_lap_joint" type="revolute">
+    <parent link="head"/>
+    <child link="leg2_lap"/>
+    <origin xyz="0.5236 0.1701 0.0" rpy="-1.57 0 -1.257"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-0.5" upper="0.5" />
+  </joint>
+  <link name="leg2_calf">
+    <visual>
+      <geometry>
+        <mesh filename="obj/calf.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/calf.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.4" rpy="0 0 0"/>
+      <mass value="0.8"/>
+      <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.005"/>
+    </inertial>
+  </link>
+  <joint name="leg2_calf_joint" type="revolute">
+    <parent link="leg2_lap"/>
+    <child link="leg2_calf"/>
+    <origin xyz="0 0 1" rpy="0 0 1.5708"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57" />
+  </joint>
+  <link name="leg2_foot">
+    <visual>
+      <geometry>
+        <mesh filename="obj/foot.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/foot.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.5"/>
+      <inertia ixx="0.02" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.002"/>
+    </inertial>
+  </link>
+  <joint name="leg2_foot_joint" type="revolute">
+    <parent link="leg2_calf"/>
+    <child link="leg2_foot"/>
+    <origin xyz="0 0 0.8" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57" />
+  </joint>
+
+  <!-- Leg 3 -->
+  <link name="leg3_lap">
+    <visual>
+      <geometry>
+        <mesh filename="obj/lap.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/lap.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <mass value="1.2"/>
+      <inertia ixx="0.08" ixy="0" ixz="0" iyy="0.08" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+  <joint name="leg3_lap_joint" type="revolute">
+    <parent link="head"/>
+    <child link="leg3_lap"/>
+    <origin xyz="0.3236 -0.4454 0.0" rpy="-1.57 0 -2.513"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-0.5" upper="0.5" />
+  </joint>
+  <link name="leg3_calf">
+    <visual>
+      <geometry>
+        <mesh filename="obj/calf.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/calf.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.4" rpy="0 0 0"/>
+      <mass value="0.8"/>
+      <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.005"/>
+    </inertial>
+  </link>
+  <joint name="leg3_calf_joint" type="revolute">
+    <parent link="leg3_lap"/>
+    <child link="leg3_calf"/>
+    <origin xyz="0 0 1" rpy="0 0 1.5708"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57" />
+  </joint>
+  <link name="leg3_foot">
+    <visual>
+      <geometry>
+        <mesh filename="obj/foot.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/foot.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.5"/>
+      <inertia ixx="0.02" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.002"/>
+    </inertial>
+  </link>
+  <joint name="leg3_foot_joint" type="revolute">
+    <parent link="leg3_calf"/>
+    <child link="leg3_foot"/>
+    <origin xyz="0 0 0.8" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57" />
+  </joint>
+
+  <!-- Leg 4 -->
+  <link name="leg4_lap">
+    <visual>
+      <geometry>
+        <mesh filename="obj/lap.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/lap.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <mass value="1.2"/>
+      <inertia ixx="0.08" ixy="0" ixz="0" iyy="0.08" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+  <joint name="leg4_lap_joint" type="revolute">
+    <parent link="head"/>
+    <child link="leg4_lap"/>
+    <origin xyz="-0.3236 -0.4454 0.0" rpy="-1.57 0 2.513"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-0.5" upper="0.5" />
+  </joint>
+  <link name="leg4_calf">
+    <visual>
+      <geometry>
+        <mesh filename="obj/calf.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/calf.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.4" rpy="0 0 0"/>
+      <mass value="0.8"/>
+      <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.005"/>
+    </inertial>
+  </link>
+  <joint name="leg4_calf_joint" type="revolute">
+    <parent link="leg4_lap"/>
+    <child link="leg4_calf"/>
+    <origin xyz="0 0 1" rpy="0 0 1.5708"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57" />
+  </joint>
+  <link name="leg4_foot">
+    <visual>
+      <geometry>
+        <mesh filename="obj/foot.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/foot.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.5"/>
+      <inertia ixx="0.02" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.002"/>
+    </inertial>
+  </link>
+  <joint name="leg4_foot_joint" type="revolute">
+    <parent link="leg4_calf"/>
+    <child link="leg4_foot"/>
+    <origin xyz="0 0 0.8" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57" />
+  </joint>
+
+  <!-- Leg 5 -->
+  <link name="leg5_lap">
+    <visual>
+      <geometry>
+        <mesh filename="obj/lap.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/lap.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.5" rpy="0 0 0"/>
+      <mass value="1.2"/>
+      <inertia ixx="0.08" ixy="0" ixz="0" iyy="0.08" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+  <joint name="leg5_lap_joint" type="revolute">
+    <parent link="head"/>
+    <child link="leg5_lap"/>
+    <origin xyz="-0.5236 0.1701 0.0" rpy="-1.57 0 1.257"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-0.5" upper="0.5" />
+  </joint>
+  <link name="leg5_calf">
+    <visual>
+      <geometry>
+        <mesh filename="obj/calf.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/calf.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.4" rpy="0 0 0"/>
+      <mass value="0.8"/>
+      <inertia ixx="0.04" ixy="0" ixz="0" iyy="0.04" iyz="0" izz="0.005"/>
+    </inertial>
+  </link>
+  <joint name="leg5_calf_joint" type="revolute">
+    <parent link="leg5_lap"/>
+    <child link="leg5_calf"/>
+    <origin xyz="0 0 1" rpy="0 0 1.5708"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57" />
+  </joint>
+  <link name="leg5_foot">
+    <visual>
+      <geometry>
+        <mesh filename="obj/foot.obj"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="obj/foot.obj"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.5"/>
+      <inertia ixx="0.02" ixy="0" ixz="0" iyy="0.02" iyz="0" izz="0.002"/>
+    </inertial>
+  </link>
+  <joint name="leg5_foot_joint" type="revolute">
+    <parent link="leg5_calf"/>
+    <child link="leg5_foot"/>
+    <origin xyz="0 0 0.8" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57" />
+  </joint>
+
+</robot>

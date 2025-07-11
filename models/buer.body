@@ -1,0 +1,272 @@
+format: ChoreonoidBody
+formatVersion: 1.0
+angleUnit: degree
+name: buer
+
+globalScale: 0.4
+
+appearance:
+  - &GOLD
+      material:
+        diffuseColor: [1.0, 0.843, 0.0]
+        specularColor: [0.8, 0.75, 0.4]
+        shininess: 0.1
+
+links:
+  #—— Base link ——
+  - name: head
+    jointType: fixed
+    translation: [0.0, 0.0, 0.0]
+    rotation: [1, 0, 0, 90]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/head.obj"
+            scale: globalScale
+          - type: AccelerationSensor
+            name: imu
+            id: 0
+            translation: [0.0, 0.0, 0.0]
+
+  #—— Leg 1 ——
+  - name: leg1_lap
+    parent: head
+    jointType: revolute
+    jointId: 0
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.5505528, 0.0]
+    rotation: [1, 0, 0, -90]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/lap.obj"
+            scale: globalScale
+
+  - name: leg1_calf
+    parent: leg1_lap
+    jointType: revolute
+    jointId: 1
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.0, 1.0]
+    rotation: [0, 0, 1, 90]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/calf.obj"
+            scale: globalScale
+
+  - name: leg1_foot
+    parent: leg1_calf
+    jointType: revolute
+    jointId: 2
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.0, 0.8]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/foot.obj"
+            scale: globalScale
+
+  #—— Leg 2 ——
+  - name: leg2_lap
+    parent: head
+    jointType: revolute
+    jointId: 3
+    jointAxis: [1, 0, 0]
+    translation: [0.5236, 0.1701, 0.0]
+    rotation: [-0.69745656, 0.50673185, -0.50673185, 110.2118]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/lap.obj"
+            scale: globalScale
+
+  - name: leg2_calf
+    parent: leg2_lap
+    jointType: revolute
+    jointId: 4
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.0, 1.0]
+    rotation: [0, 0, 1, 90]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/calf.obj"
+            scale: globalScale
+
+  - name: leg2_foot
+    parent: leg2_calf
+    jointType: revolute
+    jointId: 5
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.0, 0.8]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/foot.obj"
+            scale: globalScale
+
+  #—— Leg 3 ——
+  - name: leg3_lap
+    parent: head
+    jointType: revolute
+    jointId: 6
+    jointAxis: [1, 0, 0]
+    translation: [0.3236, -0.4454, 0.0]
+    rotation: [-0.22391898, 0.68915176, -0.68915176, 154.7572]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/lap.obj"
+            scale: globalScale
+
+  - name: leg3_calf
+    parent: leg3_lap
+    jointType: revolute
+    jointId: 7
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.0, 1.0]
+    rotation: [0, 0, 1, 90]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/calf.obj"
+            scale: globalScale
+
+  - name: leg3_foot
+    parent: leg3_calf
+    jointType: revolute
+    jointId: 8
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.0, 0.8]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/foot.obj"
+            scale: globalScale
+
+  #—— Leg 4 ——
+  - name: leg4_lap
+    parent: head
+    jointType: revolute
+    jointId: 9
+    jointAxis: [1, 0, 0]
+    translation: [-0.3236, -0.4454, 0.0]
+    rotation: [-0.22391898, -0.68915176, 0.68915176, 154.7572]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/lap.obj"
+            scale: globalScale
+
+  - name: leg4_calf
+    parent: leg4_lap
+    jointType: revolute
+    jointId: 10
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.0, 1.0]
+    rotation: [0, 0, 1, 90]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/calf.obj"
+            scale: globalScale
+
+  - name: leg4_foot
+    parent: leg4_calf
+    jointType: revolute
+    jointId: 11
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.0, 0.8]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/foot.obj"
+            scale: globalScale
+
+  #—— Leg 5 ——
+  - name: leg5_lap
+    parent: head
+    jointType: revolute
+    jointId: 12
+    jointAxis: [1, 0, 0]
+    translation: [-0.5236, 0.1701, 0.0]
+    rotation: [-0.69745656, -0.50673185, 0.50673185, 110.2118]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/lap.obj"
+            scale: globalScale
+
+  - name: leg5_calf
+    parent: leg5_lap
+    jointType: revolute
+    jointId: 13
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.0, 1.0]
+    rotation: [0, 0, 1, 90]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/calf.obj"
+            scale: globalScale
+
+  - name: leg5_foot
+    parent: leg5_calf
+    jointType: revolute
+    jointId: 14
+    jointAxis: [1, 0, 0]
+    translation: [0.0, 0.0, 0.8]
+    elements:
+      - type: Visual
+        elements:
+          - type: Shape
+            geometry:
+              type: Resource
+              uri: "obj/foot.obj"
+            scale: globalScale

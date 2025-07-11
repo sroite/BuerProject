@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<robot name="buer" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Global parameters -->
+  <xacro:property name="global_scale" value="0.0004"/>
+  <xacro:property name="mesh_path" value="stl"/>
+
+  <!-- Macros -->
+  <xacro:macro name="inertial_block" params="mass ixx iyy izz ox oy oz">
+    <inertial>
+      <origin xyz="${ox*global_scale} ${oy*global_scale} ${oz*global_scale}" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia ixx="${ixx}" ixy="0" ixz="0" iyy="${iyy}" iyz="0" izz="${izz}"/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="mesh_link" params="name file mass ixx iyy izz ox oy oz">
+    <link name="${name}">
+      <visual>
+        <geometry>
+          <mesh filename="${mesh_path}/${file}" scale="${global_scale} ${global_scale} ${global_scale}"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="${mesh_path}/${file}" scale="${global_scale} ${global_scale} ${global_scale}"/>
+        </geometry>
+      </collision>
+      <xacro:inertial_block mass="${mass}" ixx="${ixx}" iyy="${iyy}" izz="${izz}" ox="${ox}" oy="${oy}" oz="${oz}"/>
+    </link>
+  </xacro:macro>
+
+  <!-- Base link -->
+  <link name="head">
+    <visual>
+      <geometry>
+        <mesh filename="${mesh_path}/head.stl" scale="${global_scale} ${global_scale} ${global_scale}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="${1.0*global_scale}" length="${1.0*global_scale}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="8.0"/>
+      <inertia ixx="1.5" ixy="0" ixz="0" iyy="1.5" iyz="0" izz="2.0"/>
+    </inertial>
+    <sensor type="imu" name="imu">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </sensor>
+  </link>
+
+  <!-- Leg macro -->
+  <xacro:macro name="leg" params="idx lx ly lz lroll lpitch lyaw calf_rpy">
+    <!-- Lap link -->
+    <xacro:mesh_link name="leg${idx}_lap" file="lap.stl" mass="1.2" ixx="0.08" iyy="0.08" izz="0.01" ox="0" oy="0" oz="0.5"/>
+    <joint name="leg${idx}_lap_joint" type="revolute">
+      <parent link="head"/>
+      <child link="leg${idx}_lap"/>
+      <origin xyz="${lx*global_scale} ${ly*global_scale} ${lz*global_scale}" rpy="${lroll} ${lpitch} ${lyaw}"/>
+      <axis xyz="1 0 0"/>
+      <limit effort="100.0" velocity="10.0" lower="-0.5" upper="0.5"/>
+    </joint>
+
+    <!-- Calf link -->
+    <xacro:mesh_link name="leg${idx}_calf" file="calf.stl" mass="0.8" ixx="0.04" iyy="0.04" izz="0.005" ox="0" oy="0" oz="0.4"/>
+    <joint name="leg${idx}_calf_joint" type="revolute">
+      <parent link="leg${idx}_lap"/>
+      <child link="leg${idx}_calf"/>
+      <origin xyz="${0*global_scale} ${0*global_scale} ${1000*global_scale}" rpy="0 0 ${calf_rpy}"/>
+      <axis xyz="1 0 0"/>
+      <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57"/>
+    </joint>
+
+    <!-- Foot link -->
+    <xacro:mesh_link name="leg${idx}_foot" file="foot.stl" mass="0.5" ixx="0.02" iyy="0.02" izz="0.002" ox="0" oy="0" oz="0"/>
+    <joint name="leg${idx}_foot_joint" type="revolute">
+      <parent link="leg${idx}_calf"/>
+      <child link="leg${idx}_foot"/>
+      <origin xyz="${0*global_scale} ${0*global_scale} ${800*global_scale}" rpy="0 0 0"/>
+      <axis xyz="1 0 0"/>
+      <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Instantiate legs -->
+  <xacro:leg idx="1" lx="0" ly="550.5528" lz="0" lroll="-1.57" lpitch="0" lyaw="0" calf_rpy="1.5708"/>
+  <xacro:leg idx="2" lx="523.6" ly="170.1" lz="0" lroll="-1.57" lpitch="0" lyaw="-1.257" calf_rpy="1.5708"/>
+  <xacro:leg idx="3" lx="323.6" ly="-445.4" lz="0" lroll="-1.57" lpitch="0" lyaw="-2.513" calf_rpy="1.5708"/>
+  <xacro:leg idx="4" lx="-323.6" ly="-445.4" lz="0" lroll="-1.57" lpitch="0" lyaw="2.513" calf_rpy="1.5708"/>
+  <xacro:leg idx="5" lx="-523.6" ly="170.1" lz="0" lroll="-1.57" lpitch="0" lyaw="1.257" calf_rpy="1.5708"/>
+
+</robot>
