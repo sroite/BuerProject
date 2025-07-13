@@ -57,8 +57,8 @@ def get_buer_cfgs():
         "default_joint_angles": {
             'leg1_lap_joint': 0.0, 'leg1_calf_joint': 0.0, 'leg1_foot_joint': 0.0,
             'leg2_lap_joint': 0.0, 'leg2_calf_joint': 0.0, 'leg2_foot_joint': 0.0,
-            'leg3_lap_joint': 0.0, 'leg3_calf_joint': 0.0, 'leg3_foot_joint': 0.0,
-            'leg4_lap_joint': 0.0, 'leg4_calf_joint': 0.0, 'leg4_foot_joint': 0.0,
+            'leg3_lap_joint': 0.0, 'leg3_calf_joint': 0.3, 'leg3_foot_joint': 0.3,
+            'leg4_lap_joint': 0.0, 'leg4_calf_joint': -0.3, 'leg4_foot_joint': -0.3,
             'leg5_lap_joint': 0.0, 'leg5_calf_joint': 0.0, 'leg5_foot_joint': 0.0,
         },
         "dof_names": [
@@ -68,12 +68,12 @@ def get_buer_cfgs():
             'leg4_lap_joint', 'leg4_calf_joint', 'leg4_foot_joint',
             'leg5_lap_joint', 'leg5_calf_joint', 'leg5_foot_joint',
         ],
-        "kp": 200.0, 
-        "kd": 50.0, 
+        "kp": 300.0, 
+        "kd": 80.0, 
         "termination_z_threshold": 0.5, 
         "base_init_pos": [0.0, 0.0, 1.5],
         "base_init_quat": [0.707, 0.707, 0.0, 0.0], # (w,x,y,z)
-        "episode_length_s": 40.0,
+        "episode_length_s": 20.0,
         "resampling_time_s": 4.0,
         "action_scale": 0.25,
         "simulate_action_latency": True,
@@ -87,9 +87,9 @@ def get_buer_cfgs():
         "tracking_sigma": 0.25,
         "base_height_target": 1.0,
         "reward_scales": {
-            "tracking_lin_vel_x": 1.0,
-            "tracking_lin_vel_y": 3.0,
-            "tracking_ang_vel": 0.5,
+            "tracking_lin_vel_x": 3.0,
+            "tracking_lin_vel_y": 2.0,
+            "tracking_ang_vel": 1.0,
 
             "orientation": 0.5,
             "lin_vel_z": -0.1,
@@ -101,7 +101,7 @@ def get_buer_cfgs():
     }
     command_cfg = {
         "num_commands": 3,
-        "lin_vel_x_range": [-0.0, 0.0],
+        "lin_vel_x_range": [0.0, 0.0],
         "lin_vel_y_range": [-2.0, 2.0],
         "ang_vel_range": [-1.0, 1.0],
     }

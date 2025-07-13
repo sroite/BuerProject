@@ -81,8 +81,8 @@ public:
         command = Vector3d(0.0, 0.0, 0.0);
 
         // find the cfgs file
-        fs::path log_dir_path = fs::path(std::getenv("HOME")) / "ros/agent_system_ws/src/buer/logs/buer_walking/test";
-        fs::path cfgs_path = fs::path(std::getenv("HOME")) / "ros/agent_system_ws/src/buer/logs/buer_walking/test" / fs::path("cfgs.yaml");
+        fs::path log_dir_path = fs::path(std::getenv("HOME")) / "ros/agent_system_ws/src/buer/logs/buer_rolling/test";
+        fs::path cfgs_path = fs::path(std::getenv("HOME")) / "ros/agent_system_ws/src/buer/logs/buer_rolling/test" / fs::path("cfgs.yaml");
         if (!fs::exists(cfgs_path))
         {
             oss << cfgs_path << " is not found!!!";
@@ -99,8 +99,8 @@ public:
         auto command_cfg = root->findMapping("command_cfg");
 
         // env_cfg
-        P_gain = env_cfg->get("kp", 200);
-        D_gain = env_cfg->get("kd", 50);
+        P_gain = env_cfg->get("kp", 500);
+        D_gain = env_cfg->get("kd", 30);
 
         resample_interval_steps = static_cast<int>(std::round(env_cfg->get("resampling_time_s", 4.0) / dt));
 

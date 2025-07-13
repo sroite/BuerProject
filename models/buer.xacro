@@ -71,7 +71,7 @@
       <child link="leg${idx}_calf"/>
       <origin xyz="${0*global_scale} ${0*global_scale} ${1000*global_scale}" rpy="0 0 ${calf_rpy}"/>
       <axis xyz="1 0 0"/>
-      <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57"/>
+      <limit effort="100.0" velocity="10.0" lower="-2.0" upper="2.0"/>
     </joint>
 
     <!-- Foot link -->
@@ -81,7 +81,7 @@
       <child link="leg${idx}_foot"/>
       <origin xyz="${0*global_scale} ${0*global_scale} ${800*global_scale}" rpy="0 0 0"/>
       <axis xyz="1 0 0"/>
-      <limit effort="100.0" velocity="10.0" lower="-1.57" upper="1.57"/>
+      <limit effort="100.0" velocity="10.0" lower="-2.0" upper="2.0"/>
     </joint>
   </xacro:macro>
 
