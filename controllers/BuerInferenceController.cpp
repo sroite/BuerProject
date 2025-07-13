@@ -35,7 +35,8 @@ class BuerInferenceController : public SimpleController
     double P_gain;
     double D_gain;
     int num_actions;
-    double action_scale;
+    // double action_scale;
+    VectorXd action_scale;
     double ang_vel_scale;
     double lin_vel_scale;
     double dof_pos_scale;
@@ -108,6 +109,7 @@ public:
         num_actions = env_cfg->get("num_actions", 1);
         last_action = VectorXd::Zero(num_actions);
         default_dof_pos = VectorXd::Zero(num_actions);
+        action_scale = Eigen::VectorXd::Zero(num_actions);
 
         auto dof_names = env_cfg->findListing("dof_names");
         motor_dof_names.clear();
@@ -129,7 +131,21 @@ public:
         // target_dof_vel = VectorXd::Zero(num_actions);
 
         // scales
-        action_scale = env_cfg->get("action_scale", 1.0);
+        // action_scale = env_cfg->get("action_scale", 1.0);
+        auto action_scale_listing = env_cfg->findListing("action_scale");
+        if (action_scale_listing->isValid() && action_scale_listing->size() == num_actions)
+        {
+            for (int i = 0; i < action_scale_listing->size(); ++i)
+            {
+                action_scale[i] = action_scale_listing->at(i)->toDouble();
+            }
+        }
+        else
+        {
+            // 如果是单个值，则保持原有逻辑的兼容性
+            double single_action_scale = env_cfg->get("action_scale", 1.0);
+            action_scale.fill(single_action_scale);
+        }
 
         // obs_cfg
         ang_vel_scale = obs_cfg->findMapping("obs_scales")->get("ang_vel", 1.0);
@@ -211,7 +227,8 @@ public:
                 action[i] = last_action[i];
             }
 
-            target_dof_pos = action * action_scale + default_dof_pos;
+            // target_dof_pos = action * action_scale + default_dof_pos;
+            target_dof_pos = action.asDiagonal() * action_scale + default_dof_pos;
         }
         catch (const c10::Error &e)
         {

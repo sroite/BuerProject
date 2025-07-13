@@ -59,7 +59,7 @@ items:
                 reloading: false
                 export_symbols: false
         -
-          id: 5
+          id: 4
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -76,7 +76,6 @@ items:
             record_collision_data: false
             controller_options: ""
             block_scene_view_edit_mode: false
-            time_sync_items: [ 4, 9 ]
             dynamicsMode: "Forward dynamics"
             integrationMode: semi-implicit_euler
             gravity: [ 0, 0, -9.80665 ]
@@ -93,7 +92,7 @@ items:
             oldAccelSensorMode: false
           children:
             -
-              id: 6
+              id: 5
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -111,28 +110,27 @@ items:
                 enable_additional_lights: true
                 antialiasing: false
         -
-          id: 7
+          id: 6
           name: "buer"
           plugin: Body
           class: BodyItem
-          is_selected: true
           is_checked: true
           data:
             file: "../models/buer_stl.xacro"
             format: URDF
-            rootPosition: [ -0.2, 0, 1.1 ]
+            rootPosition: [ -0.7, 0, 1.1 ]
             rootAttitude: [
-              4.28007983e-15, 4.50212444e-15, -1,
-              -1, 2.22044605e-15, -4.28007983e-15,
-              2.22044605e-15, 1, 4.50212444e-15 ]
+              1, -2.88657986e-15, -1.68414387e-29,
+              0, 5.83439207e-15, -1,
+              2.88657986e-15, 1, 5.83439207e-15 ]
             jointDisplacements: [
               0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
               0, 0, 0, 0, 0 ]
-            initialRootPosition: [ -0.2, 0, 1.1 ]
+            initialRootPosition: [ -0.7, 0, 1.1 ]
             initialRootAttitude: [
-              4.4408921e-15, 4.5519144e-15, -1,
-              -1, 2.44249065e-15, -4.3298698e-15,
-              2.33146835e-15, 1, 4.6629367e-15 ]
+              1, -2.88657986e-15, -1.67632942e-29,
+              0, 5.88418203e-15, -1,
+              2.88657986e-15, 1, 5.88418203e-15 ]
             fix_root: false
             collisionDetection: true
             selfCollisionDetection: false
@@ -141,7 +139,7 @@ items:
             zmp: [ 0, 0, 0 ]
           children:
             -
-              id: 8
+              id: 7
               name: "SimpleController"
               plugin: Body
               class: SimpleControllerItem
@@ -152,6 +150,32 @@ items:
                 base_directory: "Controller directory"
                 reloading: false
                 export_symbols: false
+        -
+          id: 8
+          name: "Floor"
+          plugin: Body
+          class: BodyItem
+          is_selected: true
+          is_checked: true
+          data:
+            file: "../../choreonoid/share/model/misc/floor.body"
+            format: CHOREONOID-BODY
+            rootPosition: [ 0, 0, -0.103 ]
+            rootAttitude: [
+              1, 0, 0,
+              0, 1, 0,
+              0, 0, 1 ]
+            initialRootPosition: [ 0, 0, -0.103 ]
+            initialRootAttitude: [
+              1, 0, 0,
+              0, 1, 0,
+              0, 0, 1 ]
+            fix_root: true
+            collisionDetection: true
+            selfCollisionDetection: false
+            lock_location: false
+            scene_sensitive: true
+            zmp: [ 0, 0, 0 ]
 views:
   -
     id: 0
@@ -164,7 +188,7 @@ views:
     class: ItemTreeView
     mounted: true
     state:
-      expanded: [ 1, 2, 3, 5, 7, 8 ]
+      expanded: [ 1, 2, 3, 4, 6, 7 ]
   -
     id: 2
     plugin: Base
@@ -196,9 +220,9 @@ views:
         -
           camera: [ System, Perspective ]
           isCurrent: true
-          eye: [ 2.53427, -37.6793, 6.57643 ]
-          direction: [ 0.147861, 0.986739, -0.0669625 ]
-          up: [ 0.00992342, 0.0662231, 0.997755 ]
+          eye: [ -4.99315, -31.5477, 10.0873 ]
+          direction: [ 0.38337, 0.885104, -0.263851 ]
+          up: [ 0.104869, 0.242115, 0.964563 ]
         -
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -257,7 +281,7 @@ views:
       current_body_item: 2
       body_items:
         -
-          id: 7
+          id: 6
           selected_links: [ 0 ]
         -
           id: 2
@@ -310,8 +334,8 @@ toolbars:
     lazyCollisionDetectionMode: true
 Body:
   "BodySelectionManager":
-    current_body_item: 7
-    current_link: "head"
+    current_body_item: 8
+    current_link: "Floor"
   "KinematicFaultChecker":
     checkJointPositions: true
     angleMargin: 0
@@ -329,7 +353,12 @@ Body:
         show_cm_projection: false
         show_zmp: false
       -
-        body_item: 7
+        body_item: 6
+        show_cm: false
+        show_cm_projection: false
+        show_zmp: false
+      -
+        body_item: 8
         show_cm: false
         show_cm_projection: false
         show_zmp: false

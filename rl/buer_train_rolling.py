@@ -49,7 +49,7 @@ def get_train_cfg(exp_name, max_iterations):
         "seed": 1,
     }
     return train_cfg_dict
- 
+
 action_scale = []
 for i in range(5):
     action_scale.append(0.05)   # lap
