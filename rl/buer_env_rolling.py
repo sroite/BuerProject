@@ -13,6 +13,7 @@ class BuerEnvRolling(BuerEnv):
         # 添加滚动相关的历史记录
         self.prev_base_pos = torch.zeros_like(self.base_pos)
         self.rolling_phase = torch.zeros((self.num_envs,), device=self.device, dtype=gs.tc_float)
+        self.last_base_ang_vel = torch.zeros_like(self.base_ang_vel)
 
         # 将配置中的 action_scale 转为与 DOF 对应的 tensor
         raw_scale = self.env_cfg.get("action_scale", 1.0)
@@ -97,12 +98,15 @@ class BuerEnvRolling(BuerEnv):
         self.rolling_phase = euler_angles[:, 2]
 
     def _reward_rolling_velocity(self):
-        rolling_angular_vel = self.base_ang_vel[:, 2].abs()
+        rolling_angular_vel = -self.base_ang_vel[:, 2]
         # forward_vel = self.base_lin_vel[:, 0]
         world_fwd_vel = ((self.base_pos - self.prev_base_pos) / self.dt)[:, 0].clamp(min=0)
         # return rolling_angular_vel * forward_vel.clamp(min=0)
         return rolling_angular_vel * world_fwd_vel
-
+    
+    def _reward_ang_acc(self):
+        return torch.sum(torch.square(self.last_base_ang_vel - self.base_ang_vel), dim=1)
+    
     def _reward_forward_velocity(self):
         world_fwd_vel = ((self.base_pos - self.prev_base_pos) / self.dt)[:, 0]
         # return self.base_lin_vel[:, 0].clamp(min=0)

@@ -52,9 +52,9 @@ def get_train_cfg(exp_name, max_iterations):
 
 action_scale = []
 for i in range(5):
-    action_scale.append(0.05)   # lap
-    action_scale.append(0.5)    # calf
-    action_scale.append(0.5)    # foot
+    action_scale.append(0.1)   # lap
+    action_scale.append(0.2)    # calf
+    action_scale.append(0.3)    # foot
 
 def get_buer_rolling_cfgs():
     env_cfg = {
@@ -96,9 +96,10 @@ def get_buer_rolling_cfgs():
         "reward_scales": {
             "rolling_velocity": 12.0,
             "forward_velocity": 8.0,
+            "ang_acc": -0.5,
             
             "action_smoothness": -0.3,
-            "joint_acceleration": -0.05,
+            "joint_acceleration": -0.1,
             
             "lateral_velocity": -0.5, 
             "vertical_velocity": -0.2, 
