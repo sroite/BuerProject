@@ -55,11 +55,11 @@ def get_buer_cfgs():
     env_cfg = {
         "num_actions": 15,
         "default_joint_angles": {
-            'leg1_lap_joint': 0.0, 'leg1_calf_joint': 0.0, 'leg1_foot_joint': 0.0,
-            'leg2_lap_joint': 0.0, 'leg2_calf_joint': 0.0, 'leg2_foot_joint': 0.0,
-            'leg3_lap_joint': 0.0, 'leg3_calf_joint': 0.3, 'leg3_foot_joint': 0.3,
-            'leg4_lap_joint': 0.0, 'leg4_calf_joint': -0.3, 'leg4_foot_joint': -0.3,
-            'leg5_lap_joint': 0.0, 'leg5_calf_joint': 0.0, 'leg5_foot_joint': 0.0,
+            'leg1_lap_joint': 0.0, 'leg1_calf_joint': -0.7, 'leg1_foot_joint': 1.0,
+            'leg2_lap_joint': 0.0, 'leg2_calf_joint': -0.7, 'leg2_foot_joint': 1.0,
+            'leg3_lap_joint': 0.0, 'leg3_calf_joint': -0.7, 'leg3_foot_joint': 1.0,
+            'leg4_lap_joint': 0.0, 'leg4_calf_joint': -0.7, 'leg4_foot_joint': 1.0,
+            'leg5_lap_joint': 0.0, 'leg5_calf_joint': -0.7, 'leg5_foot_joint': 1.0,
         },
         "dof_names": [
             'leg1_lap_joint', 'leg1_calf_joint', 'leg1_foot_joint',
@@ -68,12 +68,12 @@ def get_buer_cfgs():
             'leg4_lap_joint', 'leg4_calf_joint', 'leg4_foot_joint',
             'leg5_lap_joint', 'leg5_calf_joint', 'leg5_foot_joint',
         ],
-        "kp": 300.0, 
-        "kd": 80.0, 
+        "kp": 500.0, 
+        "kd": 30.0, 
         "termination_z_threshold": 0.5, 
         "base_init_pos": [0.0, 0.0, 1.5],
         "base_init_quat": [0.707, 0.707, 0.0, 0.0], # (w,x,y,z)
-        "episode_length_s": 20.0,
+        "episode_length_s": 30.0,
         "resampling_time_s": 4.0,
         "action_scale": 0.25,
         "simulate_action_latency": True,
@@ -87,22 +87,22 @@ def get_buer_cfgs():
         "tracking_sigma": 0.25,
         "base_height_target": 1.0,
         "reward_scales": {
-            "tracking_lin_vel_x": 3.0,
-            "tracking_lin_vel_y": 2.0,
-            "tracking_ang_vel": 1.0,
+            "tracking_lin_vel_x": 5.0,
+            "tracking_lin_vel_y": 4.0,
+            "tracking_ang_vel": 3.0,
 
             "orientation": 0.5,
             "lin_vel_z": -0.1,
-            "base_height": -0.1,
+            "base_height": -0.01,
             
-            "action_rate": 1.0,
-            "similar_to_default": -0.05,
+            "action_rate": -0.1,
+            "similar_to_default": -0.01,
         },
     }
     command_cfg = {
         "num_commands": 3,
-        "lin_vel_x_range": [0.0, 0.0],
-        "lin_vel_y_range": [-2.0, 2.0],
+        "lin_vel_x_range": [-1.0, 1.0],
+        "lin_vel_y_range": [-0.7, 0.7],
         "ang_vel_range": [-1.0, 1.0],
     }
     return env_cfg, obs_cfg, reward_cfg, command_cfg
@@ -122,7 +122,7 @@ def main():
 
     if args.gui:
         print("GUI mode is enabled. Reducing the number of environments for visualization.")
-        args.num_envs = 5
+        args.num_envs = 1
         args.max_iterations = 100 
 
     log_dir = f"{args.log_dir}/{args.exp_name}/{args.param_name}"

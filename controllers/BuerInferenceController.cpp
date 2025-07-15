@@ -82,8 +82,8 @@ public:
         command = Vector3d(0.0, 0.0, 0.0);
 
         // find the cfgs file
-        fs::path log_dir_path = fs::path(std::getenv("HOME")) / "ros/agent_system_ws/src/buer/logs/buer_rolling/test";
-        fs::path cfgs_path = fs::path(std::getenv("HOME")) / "ros/agent_system_ws/src/buer/logs/buer_rolling/test" / fs::path("cfgs.yaml");
+        fs::path log_dir_path = fs::path(std::getenv("HOME")) / "ros/agent_system_ws/src/buer/logs/buer_walking/test";
+        fs::path cfgs_path = fs::path(std::getenv("HOME")) / "ros/agent_system_ws/src/buer/logs/buer_walking/test" / fs::path("cfgs.yaml");
         if (!fs::exists(cfgs_path))
         {
             oss << cfgs_path << " is not found!!!";

@@ -119,6 +119,10 @@ class BuerEnv:
         inv_base_quat = inv_quat(self.base_quat)
         self.base_lin_vel[:] = transform_by_quat(self.robot.get_vel(), inv_base_quat)
         self.base_ang_vel[:] = transform_by_quat(self.robot.get_ang(), inv_base_quat)
+        # world-frame velocities:
+        # self.base_lin_vel[:] = self.robot.get_vel()
+        # self.base_ang_vel[:] = self.robot.get_ang()
+
         self.projected_gravity = transform_by_quat(self.global_gravity, inv_base_quat)
         self.dof_pos[:] = self.robot.get_dofs_position(self.motor_dofs)
         self.dof_vel[:] = self.robot.get_dofs_velocity(self.motor_dofs)
@@ -188,6 +192,11 @@ class BuerEnv:
         self.episode_length_buf[envs_idx] = 0
         self.reset_buf[envs_idx] = True
 
+        #Randomization
+        self.randomize_friction()
+        self.randomize_pd_gains()
+        # self.randomize_armature()
+
         # Fill extras
         self.extras["episode"] = {}
         for key in self.episode_sums.keys():
@@ -238,3 +247,40 @@ class BuerEnv:
         )
         horizontal_projection_sq = torch.sum(torch.square(base_up_vector[:, :2]), dim=1) # Larger is better
         return horizontal_projection_sq
+    
+    # ------------ randomization ----------------
+    def randomize_link_properties(self):
+        # scale mass of links
+        mass_scale = 0.9 + 0.2 * torch.rand((self.robot.n_links,), device=self.device)  # 0.9〜1.1
+        self.robot.set_links_inertial_mass(mass_scale)
+
+    def randomize_com_shift(self):
+        # shift COM positions
+        num_links = self.robot.n_links
+        link_indices = list(range(num_links))
+        com_shift = 0.01 * torch.randn((self.num_envs, num_links, 3), device=self.device)  # +-0.01m=+-10mm
+        self.robot.set_COM_shift(com_shift, link_indices)
+
+    def randomize_friction(self):
+        # frictions between the ground and robots
+        # friction = 0.5 + torch.rand(1).item() # 0.5~1.5
+        friction = 0.1 + 1.6*torch.rand(1).item() # 0.1~1.7
+
+        self.robot.set_friction(friction)
+        self.ground.set_friction(friction)
+
+    def randomize_pd_gains(self):
+        # pd gains of the joint control
+        num_dofs = self.robot.n_dofs
+        kp_min, kp_max = 400.0, 600.0
+        kv_min, kv_max = 20.0, 40.0
+        kp = torch.rand(num_dofs, device=self.device) * (kp_max - kp_min) + kp_min
+        kv = torch.rand(num_dofs, device=self.device) * (kv_max - kv_min) + kv_min
+        self.robot.set_dofs_kp(kp)
+        self.robot.set_dofs_kv(kv)
+
+    def randomize_armature(self):
+        # joint's rotor inertia
+        armature_min, armature_max = 0.01, 0.15
+        armature = torch.rand(self.robot.n_dofs, device=self.device) * (armature_max - armature_min) + armature_min
+        self.robot.set_dofs_armature(armature)

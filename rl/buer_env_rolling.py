@@ -98,19 +98,19 @@ class BuerEnvRolling(BuerEnv):
         self.rolling_phase = euler_angles[:, 2]
 
     def _reward_rolling_velocity(self):
-        rolling_angular_vel = -self.base_ang_vel[:, 2]
-        # forward_vel = self.base_lin_vel[:, 0]
-        world_fwd_vel = ((self.base_pos - self.prev_base_pos) / self.dt)[:, 0].clamp(min=0)
-        # return rolling_angular_vel * forward_vel.clamp(min=0)
-        return rolling_angular_vel * world_fwd_vel
+        rolling_angular_vel = torch.square(self.base_ang_vel[:, 2])
+        forward_vel = self.base_lin_vel[:, 0]
+        # world_fwd_vel = ((self.base_pos - self.prev_base_pos) / self.dt)[:, 0].clamp(min=0)
+        return rolling_angular_vel * forward_vel.clamp(min=0)
+        # return rolling_angular_vel * world_fwd_vel
     
     def _reward_ang_acc(self):
         return torch.sum(torch.square(self.last_base_ang_vel - self.base_ang_vel), dim=1)
     
     def _reward_forward_velocity(self):
-        world_fwd_vel = ((self.base_pos - self.prev_base_pos) / self.dt)[:, 0]
-        # return self.base_lin_vel[:, 0].clamp(min=0)
-        return world_fwd_vel.clamp(min=0)
+        # world_fwd_vel = ((self.base_pos - self.prev_base_pos) / self.dt)[:, 0]
+        return self.base_lin_vel[:, 0].clamp(min=0)
+        # return world_fwd_vel.clamp(min=0)
 
     def _reward_lateral_velocity(self):
         return torch.square(self.base_lin_vel[:, 1])

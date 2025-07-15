@@ -42,7 +42,7 @@ items:
             fix_root: true
             collisionDetection: true
             selfCollisionDetection: false
-            lock_location: false
+            lock_location: true
             scene_sensitive: true
             zmp: [ 0, 0, 0 ]
           children:
@@ -77,16 +77,16 @@ items:
             controller_options: ""
             block_scene_view_edit_mode: false
             dynamicsMode: "Forward dynamics"
-            integrationMode: semi-implicit_euler
+            integrationMode: runge-kutta
             gravity: [ 0, 0, -9.80665 ]
             min_friction_coefficient: 0
             max_friction_coefficient: 100
             cullingThresh: 0.005
             contactCullingDepth: 0.05
             errorCriterion: 0.001
-            maxNumIterations: 25
-            contactCorrectionDepth: 0.00025
-            contactCorrectionVelocityRatio: 5
+            maxNumIterations: 1000
+            contactCorrectionDepth: 0.0001
+            contactCorrectionVelocityRatio: 1
             kinematicWalking: false
             2Dmode: false
             oldAccelSensorMode: false
@@ -109,53 +109,21 @@ items:
                 enable_head_light: true
                 enable_additional_lights: true
                 antialiasing: false
-        -
-          id: 6
-          name: "buer"
-          plugin: Body
-          class: BodyItem
-          is_checked: true
-          data:
-            file: "../models/buer_stl.xacro"
-            format: URDF
-            rootPosition: [ -0.7, 0, 1.1 ]
-            rootAttitude: [
-              1, -2.88657986e-15, -1.68414387e-29,
-              0, 5.83439207e-15, -1,
-              2.88657986e-15, 1, 5.83439207e-15 ]
-            jointDisplacements: [
-              0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0 ]
-            initialRootPosition: [ -0.7, 0, 1.1 ]
-            initialRootAttitude: [
-              1, -2.88657986e-15, -1.67632942e-29,
-              0, 5.88418203e-15, -1,
-              2.88657986e-15, 1, 5.88418203e-15 ]
-            fix_root: false
-            collisionDetection: true
-            selfCollisionDetection: false
-            lock_location: false
-            scene_sensitive: true
-            zmp: [ 0, 0, 0 ]
-          children:
             -
-              id: 7
-              name: "SimpleController"
+              id: 6
+              name: "WorldLogFile"
               plugin: Body
-              class: SimpleControllerItem
+              class: WorldLogFileItem
               data:
-                isNoDelayMode: false
-                controllerOptions: ""
-                controller: "BuerInferenceController"
-                base_directory: "Controller directory"
-                reloading: false
-                export_symbols: false
+                file: "buer_swing"
+                format: CNOID-WORLD-LOG
+                timeStampSuffix: false
+                recordingFrameRate: 0
         -
-          id: 8
+          id: 7
           name: "Floor"
           plugin: Body
           class: BodyItem
-          is_selected: true
           is_checked: true
           data:
             file: "../../choreonoid/share/model/misc/floor.body"
@@ -176,6 +144,48 @@ items:
             lock_location: false
             scene_sensitive: true
             zmp: [ 0, 0, 0 ]
+        -
+          id: 8
+          name: "buer"
+          plugin: Body
+          class: BodyItem
+          is_selected: true
+          is_checked: true
+          data:
+            file: "../models/buer.urdf"
+            format: URDF
+            rootPosition: [ -7.35522754e-16, -6.66133809e-16, 1.1 ]
+            rootAttitude: [
+              1, -6.6613382e-16, 6.66133815e-16,
+              6.66133815e-16, 6.123234e-17, -1,
+              6.6613382e-16, 1, 6.123234e-17 ]
+            jointDisplacements: [
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0 ]
+            initialRootPosition: [ -7.35522754e-16, -6.66133809e-16, 1.1 ]
+            initialRootAttitude: [
+              1, -6.6613382e-16, 6.66133815e-16,
+              6.66133815e-16, 2.22044605e-16, -1,
+              6.6613382e-16, 1, 2.22044605e-16 ]
+            fix_root: false
+            collisionDetection: true
+            selfCollisionDetection: false
+            lock_location: false
+            scene_sensitive: true
+            zmp: [ 0, 0, 0 ]
+          children:
+            -
+              id: 9
+              name: "SimpleController"
+              plugin: Body
+              class: SimpleControllerItem
+              data:
+                isNoDelayMode: false
+                controllerOptions: ""
+                controller: "BuerInferenceController"
+                base_directory: "Controller directory"
+                reloading: false
+                export_symbols: false
 views:
   -
     id: 0
@@ -188,7 +198,7 @@ views:
     class: ItemTreeView
     mounted: true
     state:
-      expanded: [ 1, 2, 3, 4, 6, 7 ]
+      expanded: [ 1, 2, 3, 4, 8, 9 ]
   -
     id: 2
     plugin: Base
@@ -220,9 +230,9 @@ views:
         -
           camera: [ System, Perspective ]
           isCurrent: true
-          eye: [ -4.99315, -31.5477, 10.0873 ]
-          direction: [ 0.38337, 0.885104, -0.263851 ]
-          up: [ 0.104869, 0.242115, 0.964563 ]
+          eye: [ 2.36444, -30.1041, 14.6307 ]
+          direction: [ 0.0897289, 0.905773, -0.414154 ]
+          up: [ 0.0408276, 0.412137, 0.910207 ]
         -
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -281,9 +291,6 @@ views:
       current_body_item: 2
       body_items:
         -
-          id: 6
-          selected_links: [ 0 ]
-        -
           id: 2
           selected_links: [ 0 ]
   -
@@ -335,7 +342,7 @@ toolbars:
 Body:
   "BodySelectionManager":
     current_body_item: 8
-    current_link: "Floor"
+    current_link: "head"
   "KinematicFaultChecker":
     checkJointPositions: true
     angleMargin: 0
@@ -353,7 +360,7 @@ Body:
         show_cm_projection: false
         show_zmp: false
       -
-        body_item: 6
+        body_item: 7
         show_cm: false
         show_cm_projection: false
         show_zmp: false
@@ -374,17 +381,17 @@ viewAreas:
     contents:
       type: splitter
       orientation: horizontal
-      sizes: [ 1931, 613 ]
+      sizes: [ 1014, 322 ]
       children:
         -
           type: splitter
           orientation: horizontal
-          sizes: [ 482, 1445 ]
+          sizes: [ 370, 640 ]
           children:
             -
               type: splitter
               orientation: vertical
-              sizes: [ 690, 689 ]
+              sizes: [ 485, 485 ]
               children:
                 -
                   type: pane
@@ -396,7 +403,7 @@ viewAreas:
             -
               type: splitter
               orientation: vertical
-              sizes: [ 1035, 344 ]
+              sizes: [ 729, 241 ]
               children:
                 -
                   type: pane
@@ -408,7 +415,7 @@ viewAreas:
         -
           type: splitter
           orientation: vertical
-          sizes: [ 281, 1098 ]
+          sizes: [ 197, 773 ]
           children:
             -
               type: pane
@@ -416,7 +423,7 @@ viewAreas:
             -
               type: splitter
               orientation: vertical
-              sizes: [ 401, 693 ]
+              sizes: [ 282, 487 ]
               children:
                 -
                   type: pane
