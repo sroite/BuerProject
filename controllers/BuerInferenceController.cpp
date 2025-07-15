@@ -5,11 +5,14 @@
 #include <cnoid/SimpleController>
 #include <cnoid/ValueTree>
 #include <cnoid/YAMLReader>
+#include <cnoid/Body> // 为了Link
+#include <cnoid/Link> // 为了Link
 
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
 #include <random> // C++標準乱数
+#include <algorithm> // 为了 std::clamp
 
 using namespace cnoid;
 namespace fs = std::filesystem;
@@ -25,8 +28,9 @@ class BuerInferenceController : public SimpleController
     VectorXd last_action;
     VectorXd default_dof_pos;
     VectorXd target_dof_pos;
-    // VectorXd target_dof_pos_prev;
-    // VectorXd target_dof_vel;
+    // 新增：用于存储关节限制的向量
+    VectorXd dof_pos_lower_limits;
+    VectorXd dof_pos_upper_limits;
     std::vector<std::string> motor_dof_names;
 
     torch::jit::script::Module model;
@@ -35,7 +39,6 @@ class BuerInferenceController : public SimpleController
     double P_gain;
     double D_gain;
     int num_actions;
-    // double action_scale;
     VectorXd action_scale;
     double ang_vel_scale;
     double lin_vel_scale;
@@ -110,6 +113,9 @@ public:
         last_action = VectorXd::Zero(num_actions);
         default_dof_pos = VectorXd::Zero(num_actions);
         action_scale = Eigen::VectorXd::Zero(num_actions);
+        // 初始化关节限制向量
+        dof_pos_lower_limits = VectorXd::Zero(num_actions);
+        dof_pos_upper_limits = VectorXd::Zero(num_actions);
 
         auto dof_names = env_cfg->findListing("dof_names");
         motor_dof_names.clear();
@@ -123,15 +129,24 @@ public:
         {
             std::string name = motor_dof_names[i];
             default_dof_pos[i] = default_angles->get(name, 0.0);
+            
+            // 从机器人模型中读取并存储关节限制
+            Link* joint = ioBody->joint(name);
+            if(joint) {
+                dof_pos_lower_limits[i] = joint->q_lower();
+                dof_pos_upper_limits[i] = joint->q_upper();
+            } else {
+                 io->os() << "Warning: Joint " << name << " not found for reading limits!" << std::endl;
+                 // 设置一个默认的较大范围以避免问题
+                 dof_pos_lower_limits[i] = -std::numeric_limits<double>::max();
+                 dof_pos_upper_limits[i] = std::numeric_limits<double>::max();
+            }
         }
 
         // use default_dof_pos for initializing target angles
         target_dof_pos = default_dof_pos;
-        // target_dof_pos_prev = default_dof_pos;
-        // target_dof_vel = VectorXd::Zero(num_actions);
 
         // scales
-        // action_scale = env_cfg->get("action_scale", 1.0);
         auto action_scale_listing = env_cfg->findListing("action_scale");
         if (action_scale_listing->isValid() && action_scale_listing->size() == num_actions)
         {
@@ -142,7 +157,6 @@ public:
         }
         else
         {
-            // 如果是单个值，则保持原有逻辑的兼容性
             double single_action_scale = env_cfg->get("action_scale", 1.0);
             action_scale.fill(single_action_scale);
         }
@@ -165,8 +179,6 @@ public:
         range_listing = command_cfg->findListing("ang_vel_range");
         ang_vel_range = Vector2(range_listing->at(0)->toDouble(), range_listing->at(1)->toDouble());
 
-        // モータDOFのindex取得
-
         // 乱数初期化
         rng.seed(std::random_device{}());
         dist_lin_x = std::uniform_real_distribution<double>(lin_vel_x_range[0], lin_vel_x_range[1]);
@@ -181,9 +193,7 @@ public:
             MessageView::instance()->putln(oss.str());
             return false;
         }
-        // model = torch::jit::load(model_path); // CUDA
-        // model.to(torch::kCUDA);
-        model = torch::jit::load(model_path, torch::kCPU); // CPU
+        model = torch::jit::load(model_path, torch::kCPU);
         model.to(torch::kCPU);
         model.eval();
 
@@ -209,7 +219,6 @@ public:
             for (int i = 0; i < num_actions; ++i)
                 obs_vec.push_back(last_action[i]);
 
-            // auto input = torch::from_blob(obs_vec.data(), {1, (long)obs_vec.size()}, torch::kFloat32).to(torch::kCUDA);
             auto input = torch::from_blob(obs_vec.data(), {1, (long)obs_vec.size()}, torch::kFloat32).to(torch::kCPU);
 
             std::vector<torch::jit::IValue> inputs;
@@ -227,8 +236,11 @@ public:
                 action[i] = last_action[i];
             }
 
-            // target_dof_pos = action * action_scale + default_dof_pos;
             target_dof_pos = action.asDiagonal() * action_scale + default_dof_pos;
+
+            // 新增：将目标关节位置限制在物理范围内
+            target_dof_pos = target_dof_pos.cwiseMax(dof_pos_lower_limits).cwiseMin(dof_pos_upper_limits);
+
         }
         catch (const c10::Error &e)
         {
@@ -240,7 +252,6 @@ public:
 
     virtual bool control() override
     {
-
         if (step_count % resample_interval_steps == 0)
         {
             command[0] = dist_lin_x(rng);
@@ -252,8 +263,8 @@ public:
         // get current states
         const auto rootLink = ioBody->rootLink();
         const Isometry3d root_coord = rootLink->T();
-        Vector3 angular_velocity = root_coord.linear().transpose() * rootLink->w();
-        Vector3 projected_gravity = root_coord.linear().transpose() * global_gravity;
+        Vector3d angular_velocity = root_coord.linear().transpose() * rootLink->w();
+        Vector3d projected_gravity = root_coord.linear().transpose() * global_gravity;
 
         VectorXd joint_pos(num_actions), joint_vel(num_actions);
         for (int i = 0; i < num_actions; ++i)
@@ -267,8 +278,6 @@ public:
         if (step_count % inference_interval_steps == 0)
         {
             inference(target_dof_pos, angular_velocity, projected_gravity, joint_pos, joint_vel);
-            // target_dof_vel = (target_dof_pos - target_dof_pos_prev) / inference_dt;
-            // target_dof_pos_prev = target_dof_pos;
         }
 
         // set target outputs
@@ -277,7 +286,6 @@ public:
             auto joint = ioBody->joint(motor_dof_names[i]);
             double q = joint->q();
             double dq = joint->dq();
-            // double u = P_gain * (target_dof_pos[i] - q) + D_gain * (target_dof_vel[i] - dq);
             double u = P_gain * (target_dof_pos[i] - q) + D_gain * (-dq);
             joint->u() = u;
         }
