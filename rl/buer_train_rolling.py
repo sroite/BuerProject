@@ -10,6 +10,7 @@ from .buer_env_rolling import BuerEnvRolling as BuerEnv
 from rsl_rl.runners import OnPolicyRunner
 import genesis as gs
 
+
 def get_train_cfg(exp_name, max_iterations):
     train_cfg_dict = {
         "algorithm": {
@@ -50,90 +51,118 @@ def get_train_cfg(exp_name, max_iterations):
     }
     return train_cfg_dict
 
+
 action_scale = []
 for i in range(4):
-    action_scale.append(0.02)   # lap
-    action_scale.append(0.25)    # calf
-    action_scale.append(0.35)    # foot
+    action_scale.append(0.1)  # lap
+    action_scale.append(0.3)  # calf
+    action_scale.append(0.5)  # foot
+
 
 def get_buer_rolling_cfgs():
     env_cfg = {
         "num_actions": 12,
         "default_joint_angles": {
-            'leg1_lap_joint': 0.0, 'leg1_calf_joint': -0.7, 'leg1_foot_joint': 1.0,
-            'leg2_lap_joint': 0.0, 'leg2_calf_joint': -0.7, 'leg2_foot_joint': 1.0,
-            'leg3_lap_joint': 0.0, 'leg3_calf_joint': -0.7, 'leg3_foot_joint': 1.0,
-            'leg4_lap_joint': 0.0, 'leg4_calf_joint': -0.7, 'leg4_foot_joint': 1.0,
+            "leg1_lap_joint": 0.0,
+            "leg1_calf_joint": -0.2,
+            "leg1_foot_joint": 0.8,
+            "leg2_lap_joint": 0.0,
+            "leg2_calf_joint": -0.2,
+            "leg2_foot_joint": 0.8,
+            "leg3_lap_joint": 0.0,
+            "leg3_calf_joint": -0.2,
+            "leg3_foot_joint": 0.8,
+            "leg4_lap_joint": 0.0,
+            "leg4_calf_joint": -0.2,
+            "leg4_foot_joint": 0.8,
         },
         "dof_names": [
-            'leg1_lap_joint', 'leg1_calf_joint', 'leg1_foot_joint',
-            'leg2_lap_joint', 'leg2_calf_joint', 'leg2_foot_joint',
-            'leg3_lap_joint', 'leg3_calf_joint', 'leg3_foot_joint',
-            'leg4_lap_joint', 'leg4_calf_joint', 'leg4_foot_joint',
+            "leg1_lap_joint",
+            "leg1_calf_joint",
+            "leg1_foot_joint",
+            "leg2_lap_joint",
+            "leg2_calf_joint",
+            "leg2_foot_joint",
+            "leg3_lap_joint",
+            "leg3_calf_joint",
+            "leg3_foot_joint",
+            "leg4_lap_joint",
+            "leg4_calf_joint",
+            "leg4_foot_joint",
         ],
         "kp": 500.0,
         "kd": 30.0,
         "termination_z_threshold": 0.2,
         "base_init_pos": [0.0, 0.0, 1.2],
-        "base_init_quat": [0.707, 0.707, 0.0, 0.0], 
+        "base_init_quat": [0.707, 0.707, 0.0, 0.0],
         "episode_length_s": 60.0,
         "resampling_time_s": 4.0,
-        "action_scale": action_scale,  
+        "action_scale": action_scale,
         "simulate_action_latency": True,
         "clip_actions": 100.0,
     }
-    
+
     obs_cfg = {
         "num_obs": 45,
-        "obs_scales": {"lin_vel": 2.0, "ang_vel": 0.25, "dof_pos": 1.0, "dof_vel": 0.05},
-    }
-    
-    reward_cfg = {
-        "tracking_sigma": 0.25,
-        "base_height_target": 1.0, 
-        "reward_scales": {
-            "rolling_velocity": 8.0,
-            "forward_velocity": 8.0,
-            "ang_acc": 0.0,
-            
-            "action_smoothness": -0.4,
-            "joint_acceleration": -0.4,
-            
-            "lateral_velocity": -1.5, 
-            "vertical_velocity": -1.0, 
-            "energy": -0.01,
-            # 新增：防止后退的惩罚项
-            "penalize_reversal": -2,
-
-            # Add the new penalty here with a strong negative weight
-            "no_reverse_rotation": -2,
+        "obs_scales": {
+            "lin_vel": 2.0,
+            "ang_vel": 0.25,
+            "dof_pos": 1.0,
+            "dof_vel": 0.05,
         },
     }
-    
+
+    reward_cfg = {
+        "tracking_sigma": 0.25,
+
+        # All reward scales should be positive numbers
+        "reward_scales": {
+            "forward_velocity_tracking": 3.0,
+            "rolling_velocity": 7.0,
+            "reverse_rolling": 7.0,
+            "consistent_rolling_direction": 5.0,
+            "lateral_velocity": 5.0,
+            "vertical_velocity": 0.5,
+            "body_stability": 2.0,
+            "action_smoothness": 0.1,
+            "joint_acceleration": 0.1,
+            "angular_acceleration": 0.15,
+            "forward_progress": 1.0,
+            "survival": 3.0,
+        },
+    }
+
     command_cfg = {
         "num_commands": 3,
-        "lin_vel_x_range": [-1, -0.1], 
+        "lin_vel_x_range": [1.0, 1.0],
         "lin_vel_y_range": [0.0, 0.0],
         "ang_vel_range": [0.0, 0.0],
     }
-    
+
     return env_cfg, obs_cfg, reward_cfg, command_cfg
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--exp_name", type=str, default="buer_rolling")
     parser.add_argument("--log_dir", type=str, default="logs")
-    parser.add_argument("--num_envs", type=int, default=21000)
+    parser.add_argument("--num_envs", type=int, default=25000)
     parser.add_argument("--param_name", type=str, default="test")
     parser.add_argument("--substeps", type=int, default=2)
-    parser.add_argument("--max_iterations", type=int, default=1000)
-    parser.add_argument("--gui", action="store_true", help="Enable GUI for visualization during training")
+    parser.add_argument("--max_iterations", type=int, default=100)
+    parser.add_argument(
+        "--gui",
+        action="store_true",
+        help="Enable GUI for visualization during training",
+    )
     args = parser.parse_args()
 
     gs.init(logging_level="warning")
 
     if args.gui:
-        print("GUI mode is enabled. Reducing the number of environments for visualization.")
+        print(
+            "GUI mode is enabled. Reducing the number of environments for visualization."
+        )
         args.num_envs = 1
         args.max_iterations = 1000
 
@@ -147,19 +176,25 @@ def main():
 
     # 需要修改BuerEnv以支持新的奖励函数
     env = BuerEnv(
-        num_envs=args.num_envs, 
-        env_cfg=env_cfg, 
-        obs_cfg=obs_cfg, 
-        reward_cfg=reward_cfg, 
+        num_envs=args.num_envs,
+        env_cfg=env_cfg,
+        obs_cfg=obs_cfg,
+        reward_cfg=reward_cfg,
         command_cfg=command_cfg,
-        show_viewer=args.gui
+        show_viewer=args.gui,
     )
 
     runner = OnPolicyRunner(env, train_cfg, log_dir, device="cuda:0")
-    
-    pickle.dump([env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg], open(f"{log_dir}/cfgs.pkl", "wb"))
 
-    runner.learn(num_learning_iterations=args.max_iterations, init_at_random_ep_len=True)
+    pickle.dump(
+        [env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg],
+        open(f"{log_dir}/cfgs.pkl", "wb"),
+    )
+
+    runner.learn(
+        num_learning_iterations=args.max_iterations, init_at_random_ep_len=True
+    )
+
 
 if __name__ == "__main__":
     main()
