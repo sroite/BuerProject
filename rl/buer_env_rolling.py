@@ -14,7 +14,8 @@ class BuerEnvRolling(BuerEnv):
         self.prev_base_pos = torch.zeros_like(self.base_pos)
         self.rolling_phase = torch.zeros((self.num_envs,), device=self.device, dtype=gs.tc_float)
         self.last_base_ang_vel = torch.zeros_like(self.base_ang_vel)
-
+        # 新增：记录最远前进距离 (x轴负方向)
+        self.max_forward_progress = torch.zeros((self.num_envs,), device=self.device, dtype=gs.tc_float)
         # 将配置中的 action_scale 转为与 DOF 对应的 tensor
         raw_scale = self.env_cfg.get("action_scale", 1.0)
         if not torch.is_tensor(raw_scale):
@@ -48,6 +49,10 @@ class BuerEnvRolling(BuerEnv):
         self.projected_gravity = transform_by_quat(self.global_gravity, inv_base_quat)
         self.dof_pos[:] = self.robot.get_dofs_position(self.motor_dofs)
         self.dof_vel[:] = self.robot.get_dofs_velocity(self.motor_dofs)
+        # 新增：更新最远前进进度
+        # 由于前进是x轴负方向，所以我们记录-self.base_pos[:, 0]的最大值
+        current_progress = -self.base_pos[:, 0]
+        self.max_forward_progress = torch.maximum(self.max_forward_progress, current_progress)
 
         # 计算滚动相关的度量
         self._compute_rolling_metrics()
@@ -100,17 +105,13 @@ class BuerEnvRolling(BuerEnv):
     def _reward_rolling_velocity(self):
         rolling_angular_vel = torch.square(self.base_ang_vel[:, 2])
         forward_vel = self.base_lin_vel[:, 0]
-        # world_fwd_vel = ((self.base_pos - self.prev_base_pos) / self.dt)[:, 0].clamp(min=0)
         return rolling_angular_vel * forward_vel.clamp(min=0)
-        # return rolling_angular_vel * world_fwd_vel
     
     def _reward_ang_acc(self):
         return torch.sum(torch.square(self.last_base_ang_vel - self.base_ang_vel), dim=1)
     
     def _reward_forward_velocity(self):
-        # world_fwd_vel = ((self.base_pos - self.prev_base_pos) / self.dt)[:, 0]
         return self.base_lin_vel[:, 0].clamp(min=0)
-        # return world_fwd_vel.clamp(min=0)
 
     def _reward_lateral_velocity(self):
         return torch.square(self.base_lin_vel[:, 1])
@@ -123,6 +124,16 @@ class BuerEnvRolling(BuerEnv):
 
     def _reward_joint_acceleration(self):
         return torch.sum(torch.square(self.last_dof_vel - self.dof_vel), dim=1)
+    
+    def _reward_penalize_reversal(self):
+        # 计算当前进度与历史最远进度的差距
+        # 如果当前进度小于最远进度，说明在后退，产生惩罚
+        reversal_distance = self.max_forward_progress - (-self.base_pos[:, 0])
+        return torch.square(reversal_distance)
+    
+    def _reward_no_reverse_rotation(self):
+        reverse_rotation_penalty = torch.square(self.base_ang_vel[:, 2].clamp(max=0))
+        return reverse_rotation_penalty
 
     def _reward_energy(self):
         return torch.sum(torch.abs(self.actions * self.dof_vel), dim=1)

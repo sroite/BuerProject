@@ -86,10 +86,10 @@
   </xacro:macro>
 
   <!-- Instantiate legs -->
-  <xacro:leg idx="1" lx="0" ly="550.5528" lz="0" lroll="-1.57" lpitch="0" lyaw="0" calf_rpy="1.5708"/>
-  <xacro:leg idx="2" lx="523.6" ly="170.1" lz="0" lroll="-1.57" lpitch="0" lyaw="-1.257" calf_rpy="1.5708"/>
-  <xacro:leg idx="3" lx="323.6" ly="-445.4" lz="0" lroll="-1.57" lpitch="0" lyaw="-2.513" calf_rpy="1.5708"/>
-  <xacro:leg idx="4" lx="-323.6" ly="-445.4" lz="0" lroll="-1.57" lpitch="0" lyaw="2.513" calf_rpy="1.5708"/>
-  <xacro:leg idx="5" lx="-523.6" ly="170.1" lz="0" lroll="-1.57" lpitch="0" lyaw="1.257" calf_rpy="1.5708"/>
+<xacro:leg idx="1" lx="275" ly="275" lz="0" lroll="-1.57" lpitch="0" lyaw="0" calf_rpy="1.5708"/>
+<xacro:leg idx="2" lx="275" ly="-275" lz="0" lroll="-1.57" lpitch="0" lyaw="-1.5708" calf_rpy="1.5708"/>
+<xacro:leg idx="3" lx="-275" ly="-275" lz="0" lroll="-1.57" lpitch="0" lyaw="3.1416" calf_rpy="1.5708"/>
+<xacro:leg idx="4" lx="-275" ly="275" lz="0" lroll="-1.57" lpitch="0" lyaw="1.5708" calf_rpy="1.5708"/>
+
 
 </robot>

@@ -6,6 +6,7 @@ include_directories(${Torch_INCLUDE_DIRS})
 include_directories(
   ${Torch_INCLUDE_DIRS}
   ${Qt5Widgets_INCLUDE_DIRS}
+  ${CHOREONOID_INCLUDE_DIRS}
 )
 
 # 设置C++标准

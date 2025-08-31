@@ -56,7 +56,7 @@ class BuerEnv:
         self.inv_base_init_quat = inv_quat(self.base_init_quat)
         self.robot = self.scene.add_entity(
             gs.morphs.URDF(
-                file="models/buer_test.urdf",
+                file="models/buer_fourlegs.urdf",
                 pos=self.base_init_pos.cpu().numpy(),
                 quat=self.base_init_quat.cpu().numpy(),
             ),
@@ -191,6 +191,9 @@ class BuerEnv:
         self.last_dof_vel[envs_idx] = 0.
         self.episode_length_buf[envs_idx] = 0
         self.reset_buf[envs_idx] = True
+        # 如果在 BuerEnvRolling 中，添加以下行
+        if hasattr(self, 'max_forward_progress'):
+             self.max_forward_progress[envs_idx] = 0.0
 
         #Randomization
         self.randomize_friction()

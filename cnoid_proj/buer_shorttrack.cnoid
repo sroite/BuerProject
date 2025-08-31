@@ -152,7 +152,7 @@ items:
           is_selected: true
           is_checked: true
           data:
-            file: "../models/buer.urdf"
+            file: "../models/buer_fourlegs.urdf"
             format: URDF
             rootPosition: [ -7.35522754e-16, -6.66133809e-16, 1.1 ]
             rootAttitude: [
@@ -161,7 +161,7 @@ items:
               6.6613382e-16, 1, 6.123234e-17 ]
             jointDisplacements: [
               0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0 ]
+              0, 0, ]
             initialRootPosition: [ -7.35522754e-16, -6.66133809e-16, 1.1 ]
             initialRootAttitude: [
               1, -6.6613382e-16, 6.66133815e-16,
